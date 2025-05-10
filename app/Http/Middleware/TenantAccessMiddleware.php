@@ -21,7 +21,7 @@ class TenantAccessMiddleware
         }
 
         $user = Auth::user();
-        $tenant = $request->route('tenant');
+        $tenantId = $request->route('tenant');
 
         // Si l'utilisateur est admin, il a accès à tous les tenants
         if ($user->isAdmin()) {
@@ -29,7 +29,7 @@ class TenantAccessMiddleware
         }
 
         // Vérifier si l'utilisateur a accès au tenant
-        if (!$tenant || !$user->districts()->where('tenants.id', $tenant->id)->exists()) {
+        if (!$tenantId || !$user->districts()->where('districts.id', $tenantId)->exists()) {
             // L'utilisateur n'a pas accès à ce tenant
             session()->flash('notification', [
                 'type' => 'danger',
