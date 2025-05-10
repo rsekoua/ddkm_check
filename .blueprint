@@ -1,0 +1,24 @@
+created:
+    - database/factories/RegionFactory.php
+    - database/factories/DistrictFactory.php
+    - database/factories/SiteFactory.php
+    - database/factories/DeliveryTypeFactory.php
+    - database/factories/DistributionFactory.php
+    - database/migrations/2025_05_09_142534_create_regions_table.php
+    - database/migrations/2025_05_09_142535_create_districts_table.php
+    - database/migrations/2025_05_09_142536_create_sites_table.php
+    - database/migrations/2025_05_09_142537_create_delivery_types_table.php
+    - database/migrations/2025_05_09_142538_create_distributions_table.php
+    - database/migrations/2025_05_09_142539_create_district_user_table.php
+    - app/Models/Region.php
+    - app/Models/District.php
+    - app/Models/Site.php
+    - app/Models/DeliveryType.php
+    - app/Models/Distribution.php
+models:
+    User: { name: string, email: string, is_admin: 'boolean default:1', email_verified_at: 'timestamp nullable', password: string, remember_token: 'string:100 nullable' }
+    Region: { name: string, relationships: { hasMany: District } }
+    District: { region_id: 'id foreign', name: string, relationships: { belongsTo: Region, hasMany: 'Site, Distribution', belongsToMany: User } }
+    Site: { district_id: 'id foreign', name: string, address: 'string nullable', contact_info: 'string nullable', relationships: { belongsTo: District, hasMany: Distribution } }
+    DeliveryType: { name: string, description: 'text nullable', relationships: { hasMany: Distribution } }
+    Distribution: { district_id: 'id foreign nullable', site_id: 'id foreign', delivery_type_id: 'id foreign', delivery_date: datetime, difficulties: 'text nullable', solutions: 'text nullable', notes: 'text nullable', relationships: { belongsTo: 'Site, DeliveryType, District' } }

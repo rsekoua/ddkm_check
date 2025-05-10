@@ -1,0 +1,46 @@
+models:
+  Region:
+    name: string
+    relationships:
+      hasMany: District
+
+  District:
+    region_id: id foreign
+    name: string
+    relationships:
+      belongsTo: Region
+      hasMany: Site, Distribution
+      belongsToMany: User
+
+  Site:
+    district_id: id foreign
+    name: string
+    address: string nullable
+    contact_info: string nullable
+    relationships:
+      belongsTo: District
+      hasMany: Distribution
+
+  DeliveryType:
+    name: string
+    description: text nullable
+    relationships:
+      hasMany: Distribution
+
+  Distribution:
+    district_id: id foreign nullable
+    site_id: id foreign
+    delivery_type_id: id foreign
+    delivery_date: datetime
+    difficulties: text nullable
+    solutions: text nullable
+    notes: text nullable
+    relationships:
+      belongsTo: Site, DeliveryType, District
+migrations:
+  # Table pivot pour la relation many-to-many entre District et User
+  district_user:
+    user_id: id foreign
+    district_id: id foreign
+    primary: [user_id, district_id]
+
