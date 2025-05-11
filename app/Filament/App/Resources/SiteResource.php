@@ -5,6 +5,7 @@ namespace App\Filament\App\Resources;
 use App\Filament\App\Resources\SiteResource\Pages;
 use App\Filament\App\Resources\SiteResource\RelationManagers;
 use App\Models\Site;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -25,6 +26,8 @@ class SiteResource extends Resource
             ->schema([
                 Forms\Components\Select::make('district_id')
                     ->relationship('district', 'name')
+                    ->default(fn () => Filament::getTenant()?->id)
+                    ->disabled('edit')
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -49,14 +52,7 @@ class SiteResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contact_info')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //
@@ -74,7 +70,7 @@ class SiteResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DistributionsRelationManager::class
         ];
     }
 
