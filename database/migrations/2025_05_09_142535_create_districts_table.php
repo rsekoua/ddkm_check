@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('region_id')->constrained();
             $table->string('name');
+            $table->string('slug')->unique();
             $table->timestamps();
         });
 

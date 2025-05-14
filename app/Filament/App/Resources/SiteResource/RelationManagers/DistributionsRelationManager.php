@@ -73,9 +73,10 @@ class DistributionsRelationManager extends RelationManager
                 Forms\Components\DatePicker::make('delivery_date')
                     ->required()
                     ->date()
+//                    ->displayFormat('d/m/Y')
                     ->maxDate(now())
                     ->native(false)
-                    ->format('d/m/Y')
+//                    ->format('d/m/Y')
                     ->rules([
                         function (Forms\Get $get, $record) {
                             $siteId = $get('site_id');
@@ -97,7 +98,7 @@ class DistributionsRelationManager extends RelationManager
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
-            ])->columns(3)
+            ])->columns(2)
             ;
     }
 
@@ -124,10 +125,26 @@ class DistributionsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                ->successNotification(
+                    Notification::make()
+                        ->success()
+                        ->title('Distribution créée')
+                        ->body('La distribution a été créée avec succès.')
+
+                ),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Distribution mise à jour')
+                            ->body('La distribution a été mise à jour avec succès.')
+                            ->icon('heroicon-o-check-circle')
+
+
+                    ),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

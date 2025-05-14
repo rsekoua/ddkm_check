@@ -46,7 +46,11 @@ class UniqueMonthlyDistributionRule implements ValidationRule
         }
 
         if ($query->exists()) {
-            $fail('Une distribution existe déjà pour ce site et ce type de livraison dans ce mois.');
+
+            $monthYear = $date->translatedFormat('F Y'); // 'F' pour le nom complet du mois, 'Y' pour l'année sur 4 chiffres
+          //  $fail("Une distribution existe déjà pour ce site et ce type de livraison pour le mois de {$monthYear}.");
+            $fail("Pour ce mois de {$monthYear}, Une distribution du même type existe déjà pour ce site.");
+
         }
 
     }

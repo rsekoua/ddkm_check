@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Region extends Model
 {
@@ -17,7 +18,16 @@ class Region extends Model
      */
     protected $fillable = [
         'name',
+        'slug'
     ];
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        if ($value) { // S'assurer que la valeur n'est pas vide pour générer le slug
+            $this->attributes['slug'] = Str::slug($value);
+        }
+    }
 
     /**
      * Get the attributes that should be cast.

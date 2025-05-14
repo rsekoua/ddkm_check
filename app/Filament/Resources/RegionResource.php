@@ -7,11 +7,13 @@ use App\Filament\Resources\RegionResource\RelationManagers;
 use App\Models\Region;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class RegionResource extends Resource
 {
@@ -26,7 +28,22 @@ class RegionResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live(debounce: '500ms') // Ou simplement ->live() pour une mise à jour instantanée
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        if ($state) {
+                            $set('slug', Str::slug($state));
+                        } else {
+                            // Optionnel: vider le slug si le nom est vidé
+                            $set('slug', null);
+                        }
+                    }),
+
+                Forms\Components\TextInput::make('slug')
+                    ->required() // Le slug sera généralement requis si vous l'utilisez dans les URLs
+                    ->maxLength(255)
+                    ->disabled()
+                    ->readOnly()
             ]);
     }
 
@@ -35,6 +52,8 @@ class RegionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

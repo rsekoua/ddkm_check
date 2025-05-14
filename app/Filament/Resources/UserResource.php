@@ -37,7 +37,8 @@ class UserResource extends Resource
                     ->helperText('Accorde tous les droits d\'administration')
                     ->default(false)
                     ->required(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\DatePicker::make('email_verified_at')
+                ->native(false),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()

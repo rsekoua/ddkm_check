@@ -8,6 +8,7 @@ use App\Models\Site;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -58,7 +59,16 @@ class SiteResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Distribution mise à jour')
+                            ->body('La distribution a été mise à jour avec succès.')
+                            ->icon('heroicon-o-check-circle')
+
+
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

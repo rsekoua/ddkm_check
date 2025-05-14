@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Site extends Model
 {
@@ -21,6 +22,7 @@ class Site extends Model
         'name',
         'address',
         'contact_info',
+        'slug'
     ];
 
     /**
@@ -44,5 +46,19 @@ class Site extends Model
     public function distributions(): HasMany
     {
         return $this->hasMany(Distribution::class);
+    }
+
+
+    public function getRouteKeyName()
+    {
+        return 'slug'; // Remplacez 'slug' par le nom de votre colonne de slug dans la table des sites
+    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        if ($value) { // S'assurer que la valeur n'est pas vide pour générer le slug
+            $this->attributes['slug'] = Str::slug($value);
+        }
     }
 }

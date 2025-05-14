@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class District extends Model implements HasName,HasCurrentTenantLabel
 {
@@ -22,6 +23,8 @@ class District extends Model implements HasName,HasCurrentTenantLabel
     protected $fillable = [
         'region_id',
         'name',
+        'slug'
+
     ];
 
     /**
@@ -64,5 +67,31 @@ class District extends Model implements HasName,HasCurrentTenantLabel
     {
         return "Region  {$this->region()->first()->name}";
     }
+
+    /**
+     * Set the name and automatically generate the slug.
+     *
+     * @param  string  $value
+     * @return void
+     */
+//    public function setNameAttribute($value)
+//    {
+//        $this->attributes['name'] = $value;
+//        $this->attributes['slug'] = Str::slug($value); // Génère le slug à partir du nom
+//    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        if ($value) { // S'assurer que la valeur n'est pas vide pour générer le slug
+            $this->attributes['slug'] = Str::slug($value);
+        }
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug'; // Indique à Laravel d'utiliser la colonne 'slug' pour le binding
+    }
+
 
 }

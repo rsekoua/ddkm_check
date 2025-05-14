@@ -2,14 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\App\Pages\Dashboard;
 use App\Http\Middleware\TenantAccessMiddleware;
-use App\Http\Responses\LoginResponse;
 use App\Models\District;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -31,17 +30,13 @@ class AppPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->pages([
+                Dashboard::class,
+            ])
             ->brandName('Gestion des distributions')
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
-            ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
+            //->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
             ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
-            ->widgets([
-//                Widgets\AccountWidget::class,
-//                Widgets\FilamentInfoWidget::class,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -55,14 +50,16 @@ class AppPanelProvider extends PanelProvider
             ])
             ->tenant(
                 District::class,
-               // slugAttribute: 'slug',
-                ownershipRelationship: 'district'// Adaptez selon votre structure
+                ownershipRelationship: 'district',
+                slugAttribute: 'slug'
             )
+            ->tenantMenu(true)
             ->tenantMiddleware([
                 TenantAccessMiddleware::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ;
     }
 }

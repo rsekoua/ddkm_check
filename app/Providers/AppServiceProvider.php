@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\Responses\LoginResponse;
 use Filament\Facades\Filament;
 use Filament\Http\Responses\Auth\LoginResponse as BaseLoginResponse;
+use Filament\Notifications\Livewire\Notifications;
 use Illuminate\Support\ServiceProvider;
 
 
@@ -27,6 +28,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+
     }
 }

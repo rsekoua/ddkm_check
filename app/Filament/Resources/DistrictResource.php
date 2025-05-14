@@ -7,11 +7,13 @@ use App\Filament\Resources\DistrictResource\RelationManagers;
 use App\Models\District;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class DistrictResource extends Resource
 {
@@ -29,6 +31,19 @@ class DistrictResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->maxLength(255)
+                    ->live(debounce: '500ms') // Ou simplement ->live() pour une mise à jour instantanée
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        if ($state) {
+                            $set('slug', Str::slug($state));
+                        } else {
+                            // Optionnel: vider le slug si le nom est vidé
+                            $set('slug', null);
+                        }
+                    }),
+                Forms\Components\TextInput::make('slug')
+                    ->required()
+                    ->disabled()
                     ->maxLength(255),
             ]);
     }
@@ -41,6 +56,8 @@ class DistrictResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
