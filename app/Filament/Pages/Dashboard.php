@@ -1,46 +1,31 @@
 <?php
+namespace App\Filament\Pages;
 
-namespace App\Filament\App\Pages;
-
-use App\Filament\App\Widgets\DistributionStatsWidget;
-use App\Filament\App\Widgets\LatestDistributionsTableWidget; // Importer le nouveau widget de table
-use App\Models\Site;
-use Filament\Facades\Filament;
+use App\Filament\Widgets\DeliveredSitesStatsOverview;
+use App\Models\District;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Pages\Dashboard as BaseDashboard;
-// Les imports suivants ne semblent pas utilisés et peuvent être enlevés si c'est le cas
-// use Filament\Pages\Dashboard\Actions\FilterAction;
-// use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
-// use Illuminate\Contracts\View\View;
-// use Laravel\Sail\Console\AddCommand;
 
 class Dashboard extends BaseDashboard
 {
     use BaseDashboard\Concerns\HasFiltersForm;
 
-    // Définir les propriétés pour stocker les valeurs de filtres
+    // Propriété pour stocker les valeurs des filtres
     public ?array $filter = [];
-    // Remplacer le titre de la page pour y inclure le nom du district (tenant)
+
+    // Définir le titre de la page
     public function getTitle(): string
     {
-        $tenant = Filament::getTenant();
-
-        if ($tenant) {
-            return "District {$tenant->name}";
-        }
-
-        return "Tableau de bord";
+        return "Tableau de bord Administrateur";
     }
-
 
     // Méthode pour propager les changements de filtre aux widgets
     public function updatedFilter(): void
     {
-        // Utiliser dispatch() au lieu de emit() dans Filament v3
         $this->dispatch('filter-updated', filters: $this->filter);
     }
 
@@ -50,41 +35,41 @@ class Dashboard extends BaseDashboard
             ->schema([
                 Section::make()
                     ->schema([
-                        // Votre code existant pour les composants de formulaire...
-                        Select::make('site_id')
-                            ->label('Site')
-                            ->options(function () {
-                                $district = Filament::getTenant();
-                                if (!$district) {
-                                    return [];
-                                }
-                                return Site::query()->where('district_id', $district->id)
+                        Select::make('district_id')
+                            ->label('District')
+                            ->options(
+                                District::query()
                                     ->pluck('name', 'id')
-                                    ->toArray();
-                            })->searchable()
-                            ->placeholder('Tous les sites')
+                                    ->toArray()
+                            )
+                            ->searchable()
+                            ->placeholder('Tous les districts')
                             ->live()
                             ->afterStateUpdated(function () {
                                 $this->updatedFilter();
                             }),
                         DatePicker::make('startDate')
+                            ->label('Date de début')
                             ->maxDate(function (Get $get) {
                                 $endDate = $get('endDate');
                                 return $endDate ?: now();
                             })
                             ->live()
                             ->native(false)
-                            ->hint('Filtre par date de livraison')
+                            ->hint('Filtrer par date')
                             ->afterStateUpdated(function () {
                                 $this->updatedFilter();
                             }),
                         DatePicker::make('endDate')
+                            ->label('Date de fin')
                             ->minDate(function (Get $get) {
                                 return $get('startDate');
                             })
                             ->maxDate(now())
                             ->afterStateUpdated(function (Get $get, $state, callable $set) {
                                 $startDate = $get('startDate');
+                                // Si la date de fin est définie et antérieure à la date de début,
+                                // ajuster la date de début pour qu'elle soit égale à la date de fin.
                                 if ($state && $startDate && $startDate > $state) {
                                     $set('startDate', $state);
                                 }
@@ -92,22 +77,25 @@ class Dashboard extends BaseDashboard
                             })
                             ->live()
                             ->native(false)
-                            ->hint('Filtre par date de livraison'),
+                            ->hint('Filtrer par date'),
                     ])
                     ->columns(3),
             ])
-            ->statePath('filter');
+            ->statePath('filter'); // Important pour lier le formulaire à la propriété $filter
     }
 
-    // Hook pour le cycle de vie Livewire
+    // Hook pour le cycle de vie Livewire, exécuté lorsque le composant est initialisé
     public function booted(): void
     {
-        // S'assurer que les filtres sont initialisés et transmis lors du chargement initial
+        // S'assurer que les filtres sont initialisés avec les valeurs par défaut du formulaire
+        // et transmis lors du chargement initial.
         if (empty($this->filter) && method_exists($this, 'filtersForm')) {
-            // Initialiser avec les valeurs par défaut du formulaire si $filter est vide.
+            // Initialiser avec les valeurs par défaut (null pour chaque champ)
             $this->filter = $this->filtersForm(Form::make())->getState();
         }
-        // Utiliser dispatch() au lieu de emit() dans Filament v3
+        // Dispatch l'événement initial pour que les widgets se chargent avec les filtres par défaut (ou vides)
         $this->dispatch('filter-updated', filters: $this->filter);
     }
+
+
 }

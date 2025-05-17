@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SiteResource\Pages;
-use App\Filament\Resources\SiteResource\RelationManagers;
+use App\Filament\Resources\PresResource\Pages;
+use App\Filament\Resources\PresResource\RelationManagers;
+use App\Models\Pres;
 use App\Models\Site;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,33 +14,31 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SiteResource extends Resource
+class PresResource extends Resource
 {
-    protected static ?string $model = Site::class;
+    protected static ?string $model = Pres::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Gestion des sites';
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Site::query()
+        return (string) Pres::query()
             ->count();
     }
 
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Le nombre de Pole Regional Sanitaire';
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('district_id')
-                    ->relationship('district', 'name')
-                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('address')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('contact_info')
-                    ->maxLength(255),
+
             ]);
     }
 
@@ -48,30 +46,24 @@ class SiteResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('district.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('address')
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contact_info')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('created_at')
+//                    ->dateTime()
+//                    ->sortable()
+//                    ->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('updated_at')
+//                    ->dateTime()
+//                    ->sortable()
+//                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -80,10 +72,19 @@ class SiteResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageSites::route('/'),
+            'index' => Pages\ListPres::route('/'),
+            'create' => Pages\CreatePres::route('/create'),
+            'edit' => Pages\EditPres::route('/{record}/edit'),
         ];
     }
 }

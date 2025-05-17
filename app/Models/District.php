@@ -40,6 +40,7 @@ class District extends Model implements HasName,HasCurrentTenantLabel
         ];
     }
 
+
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
@@ -74,11 +75,6 @@ class District extends Model implements HasName,HasCurrentTenantLabel
      * @param  string  $value
      * @return void
      */
-//    public function setNameAttribute($value)
-//    {
-//        $this->attributes['name'] = $value;
-//        $this->attributes['slug'] = Str::slug($value); // Génère le slug à partir du nom
-//    }
 
     public function setNameAttribute($value)
     {

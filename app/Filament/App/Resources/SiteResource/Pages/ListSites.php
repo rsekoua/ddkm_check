@@ -12,6 +12,7 @@ class ListSites extends ListRecords
 {
     protected static string $resource = SiteResource::class;
 
+
     protected function getHeaderActions(): array
     {
         return [
@@ -22,10 +23,7 @@ class ListSites extends ListRecords
     {
         $tenant = Filament::getTenant();
         if ($tenant) {
-            // Supposant que votre modèle District a un attribut 'name'
-            // et que getFilamentName() est disponible pour le formatage souhaité.
-            // Si getFilamentName() n'existe pas ou si vous préférez le nom simple :
-            // return __('Sites du District: :districtName', ['districtName' => $tenant->name]);
+
             return __(':districtName', ['districtName' => $tenant->getFilamentName()]);
         }
 

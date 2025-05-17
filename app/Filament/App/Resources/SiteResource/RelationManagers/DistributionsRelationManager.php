@@ -114,10 +114,11 @@ class DistributionsRelationManager extends RelationManager
                     ->label('Type de livraison')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('district.name')
-                    ->numeric()
-                    ->sortable(),
+//                Tables\Columns\TextColumn::make('district.name')
+//                    ->numeric()
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('delivery_date')
+                    ->label('Date de livraison')
                     ->date()
                     ->sortable(),
             ])
@@ -126,7 +127,8 @@ class DistributionsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                ->successNotification(
+                    ->label('Créer une nouvelle distribution')
+                    ->successNotification(
                     Notification::make()
                         ->success()
                         ->title('Distribution créée')

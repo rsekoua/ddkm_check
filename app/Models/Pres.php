@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-class Region extends Model
+class Pres extends Model
 {
     use HasFactory;
 
@@ -18,7 +17,6 @@ class Region extends Model
      * @var array
      */
     protected $fillable = [
-        'pres_id',
         'name',
         'slug'
     ];
@@ -41,16 +39,11 @@ class Region extends Model
     {
         return [
             'id' => 'integer',
-            'region_id' => 'integer',
         ];
     }
 
-    public function pres(): BelongsTo
+    public function regions(): HasMany
     {
-        return $this->belongsTo(Pres::class);
-    }
-    public function districts(): HasMany
-    {
-        return $this->hasMany(District::class);
+        return $this->hasMany(Region::class);
     }
 }

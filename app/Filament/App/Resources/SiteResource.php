@@ -19,6 +19,46 @@ class SiteResource extends Resource
 {
     protected static ?string $model = Site::class;
 
+    // Filament 3 utilise cette méthode pour le label de navigation
+    public static function getNavigationLabel(): string
+    {
+        return __('Sites');
+    }
+
+    // Méthode pour ajouter un badge au label de navigation
+    public static function getNavigationBadge(): ?string
+    {
+        $tenant = Filament::getTenant();
+
+        if (!$tenant) {
+            return null;
+        }
+
+        return (string) Site::query()
+            ->where('district_id', $tenant->id)
+            ->count();
+    }
+
+    // Définir la couleur du badge (options: primary, secondary, success, warning, danger, gray)
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
+
+    // Désactive la pluralisation (syntaxe Filament 3)
+    public static function getPluralModelLabel(): string
+    {
+        return __('Sites');
+    }
+
+    // Pour la cohérence des labels au singulier également
+    public static function getModelLabel(): string
+    {
+        return __('Site');
+    }
+
+
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -49,11 +89,10 @@ class SiteResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('contact_info')
                     ->searchable(),
-
+                Tables\Columns\TextColumn::make('address')
+                    ->searchable(),
             ])
             ->filters([
                 //
@@ -63,18 +102,17 @@ class SiteResource extends Resource
                     ->successNotification(
                         Notification::make()
                             ->success()
-                            ->title('Distribution mise à jour')
-                            ->body('La distribution a été mise à jour avec succès.')
+                            ->title('Site mise à jour')
+                            ->body('Le site a été mise à jour avec succès.')
                             ->icon('heroicon-o-check-circle')
-
-
                     ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ;
     }
 
     public static function getRelations(): array

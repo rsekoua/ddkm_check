@@ -8,10 +8,16 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Facades\Filament;
 
-class LatestDistributionsWidget extends BaseWidget
+class LatestDistributionsWidget2 extends BaseWidget
 {
-    protected static ?int $sort = 2;
+//    protected static ?int $sort = 1;
     protected int | string | array $columnSpan = 'full';
+
+    protected function getFilterData(): array
+    {
+        return $this->getLivewire()->getWidgetData()['filter'] ?? [];
+    }
+
 
     public function table(Table $table): Table
     {

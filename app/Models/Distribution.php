@@ -39,7 +39,7 @@ class Distribution extends Model
             'district_id' => 'integer',
             'site_id' => 'integer',
             'delivery_type_id' => 'integer',
-            'delivery_date' => 'datetime',
+            'delivery_date' => 'date',
         ];
     }
 

@@ -3,6 +3,11 @@
 namespace App\Providers\Filament;
 
 use App\Filament\App\Pages\Dashboard;
+use App\Filament\App\Widgets\DistributionFilterWidget;
+use App\Filament\App\Widgets\DistributionsTableWidget;
+use App\Filament\App\Widgets\DistributionStatsWidget;
+use App\Filament\App\Widgets\LatestDistributionsTableWidget;
+use App\Filament\App\Widgets\LatestDistributionsWidget;
 use App\Http\Middleware\TenantAccessMiddleware;
 use App\Models\District;
 use Filament\Http\Middleware\Authenticate;
@@ -26,17 +31,25 @@ class AppPanelProvider extends PanelProvider
         return $panel
             ->id('app')
             ->login()
+            ->registration()
+            ->passwordReset()
+            ->profile()
             ->path('app')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
             ->pages([
                 Dashboard::class,
             ])
             ->brandName('Gestion des distributions')
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
-            ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
-            ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
+           // ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
+           // ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
+           // ->discoverWidgets(in: app_path('Filament/App/Widgets'))
+           ->widgets([
+               DistributionStatsWidget::class,
+               LatestDistributionsTableWidget::class
+           ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -49,9 +62,7 @@ class AppPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->tenant(
-                District::class,
-                ownershipRelationship: 'district',
-                slugAttribute: 'slug'
+                District::class, slugAttribute: 'slug', ownershipRelationship: 'district'
             )
             ->tenantMenu(true)
             ->tenantMiddleware([

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DistrictResource\Pages;
 use App\Filament\Resources\DistrictResource\RelationManagers;
 use App\Models\District;
+use App\Models\Region;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -22,6 +23,11 @@ class DistrictResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Gestion des sites';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) District::query()->count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -32,19 +38,20 @@ class DistrictResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->live(debounce: '500ms') // Ou simplement ->live() pour une mise à jour instantanée
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
-                        if ($state) {
-                            $set('slug', Str::slug($state));
-                        } else {
-                            // Optionnel: vider le slug si le nom est vidé
-                            $set('slug', null);
-                        }
-                    }),
-                Forms\Components\TextInput::make('slug')
-                    ->required()
-                    ->disabled()
-                    ->maxLength(255),
+//                    ->live(debounce: '500ms') // Ou simplement ->live() pour une mise à jour instantanée
+//                    ->afterStateUpdated(function (Set $set, ?string $state) {
+//                        if ($state) {
+//                            $set('slug', Str::slug($state));
+//                        } else {
+//                            // Optionnel: vider le slug si le nom est vidé
+//                            $set('slug', null);
+//                        }
+//                    })
+                ,
+//                Forms\Components\TextInput::make('slug')
+//                    ->required()
+//                    ->disabled()
+//                    ->maxLength(255),
             ]);
     }
 

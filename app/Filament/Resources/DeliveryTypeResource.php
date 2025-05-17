@@ -20,7 +20,11 @@ class DeliveryTypeResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Gestion des livraisons';
-
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) DeliveryType::query()
+            ->count();
+    }
     public static function form(Form $form): Form
     {
         return $form

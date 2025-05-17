@@ -5,9 +5,14 @@ namespace Database\Seeders;
 use App\Models\DeliveryType;
 use App\Models\District;
 use App\Models\Region;
+use App\Models\Site;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,54 +29,60 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
+        $filePath = Storage::path('app/private/sites.xlsx');
 
-//        // Liste des régions à créer
-//        $regions = [
-//            'BAFING',
-//            'IFFOU',
-//
-//        ];
-//        // Création des régions
-//        foreach ($regions as $regionName) {
-//            Region:: query()->create([
-//                'name' => $regionName,
-//            ]);
-//        }
+        if (!file_exists($filePath)) {
+            Log::error("Le fichier sites.xlsx n'existe pas dans le dossier storage/app/private");
+            return;
+        }
 
-        // Création des districts pour chaque région
-//        $districtsData = [
-//            'BAFING' => ['KORO','OUANINOU','TOUBA'],
-//            'IFFOU'=> ['DAOUKRO','M\'BAHIAKRO','PRIKRO'],
-//        ];
+        $spreadsheet = IOFactory::load($filePath);
+        $worksheet = $spreadsheet->getActiveSheet();
 
-//        foreach ($districtsData as $regionName => $districts) {
-//            $region = Region::query()->where('name', $regionName)->first();
-//
-//            if ($region) {
-//                foreach ($districts as $districtName) {
-//                    District::query()->create([
-//                        'region_id' => $region->id,
-//                        'name' => $districtName,
-//                    ]);
-//                }
-//            }
-//        }
-//
-//
-//        // Liste des régions à créer
-//        $delivery_type  = [
-//            'Par le district',
-//            'Par la NPSP',
-//            'Par l\'ESPC',
-//            'Par un autre moyen',
-//        ];
-        // Création des régions
-//        foreach ($delivery_type as $delivery_type_name) {
-//            DeliveryType::query()->create([
-//                'name' => $delivery_type_name,
-//            ]);
-//        }
+        $regionsMap = [];
+        $districtsMap = [];
+        $row = 2;
 
+        $columnLetters = ['A', 'B', 'C', 'D']; // A=1, B=2, C=3, etc.
+
+        while ($worksheet->getCell($columnLetters[0] . $row)->getValue() !== null) {
+            $regionName = $worksheet->getCell($columnLetters[0] . $row)->getValue();
+            $districtName = $worksheet->getCell($columnLetters[1] . $row)->getValue();
+            $siteName = $worksheet->getCell($columnLetters[2] . $row)->getValue();
+
+            // Créer ou récupérer la région
+            if (!isset($regionsMap[$regionName])) {
+                $region = Region::query()->firstOrCreate([
+                    'name' => $regionName,
+                    'slug' => Str::slug($regionName)
+                ]);
+                $regionsMap[$regionName] = $region->id;
+            }
+
+            // Créer ou récupérer le district
+            $districtKey = $regionName . '-' . $districtName;
+            if (!isset($districtsMap[$districtKey])) {
+                $district = District::query()->firstOrCreate([
+                    'name' => $districtName,
+                    'slug' => Str::slug($districtName),
+                    'region_id' => $regionsMap[$regionName]
+                ]);
+                $districtsMap[$districtKey] = $district->id;
+            }
+
+            // Créer le site
+            Site::query()->firstOrCreate([
+                'name' => $siteName,
+                'slug' => Str::slug($siteName),
+                'district_id' => $districtsMap[$districtKey]
+            ]);
+
+            $row++;
+        }
+
+        $this->command->info('Importation des données depuis sites.xlsx terminée avec succès.');
 
     }
+
+
 }
